@@ -1,0 +1,57 @@
+<table class="zebra">
+    <tbody>
+        {foreach $filters as $f_id => $f}
+            {if $f_id == 'price'}
+                <tr>
+                    <td class="min-width">
+                        <input id="s-c-condition-price-interval" type="checkbox" name="condition[price]" value="price"{if !empty($filter.conditions.price)} checked{/if}>
+                    </td>
+                    <td>
+                        <label for="s-c-condition-price-interval">Цена</label>
+                    </td>
+                    <td colspan="2">
+                        {if !empty($filter.conditions.price)}
+                            {foreach $filter.conditions.price as $price_condition}
+                                {if $price_condition[0] == '>='}
+                                    {$price_min = $price_condition[1]}
+                                {elseif $price_condition[0] == '<='}
+                                    {$price_max = $price_condition[1]}
+                                {/if}
+                            {/foreach}
+                        {/if}
+                        <label>
+                            От <input type="text" name="price[0]" placeholder="{number_format($f.min, 2, '.', '')}" value="{$price_min|default:''|escape}">
+                        </label>
+                        <label>
+                            До <input type="text" name="price[1]" placeholder="{number_format($f.max, 2, '.', '')}" value="{$price_max|default:''|escape}">
+                        </label>
+                        {$currency}
+                    </td>
+                </tr>
+            {else}
+                <tr>
+                    <td class="min-width">
+                        <input id="s-c-condition-feature-{$f.code}" type="checkbox" name="condition[feature][]" value="{$f.code}"{if !empty($filter.conditions.feature[$f.code])} checked{/if}>
+                    </td>
+                    <td>
+                        <label for="s-c-condition-feature-{$f.code}">{$f.name|escape}</label> <span class="hint">{$f.code}</span>
+                    </td>
+                    <td>
+                        <select data-type="{$f.type}" name="feature_values[{$f.code}]" class="s-feature_value" data-feature-id="{$f.code}">
+                            {foreach $f.values as $v_id => $value}
+                                <option value="{$v_id}"{if is_object($value)} style="{$value.style|default:''}"{/if}{if !empty($filter.conditions.feature[$f.code][1]) && $filter.conditions.feature[$f.code][1]==$v_id} selected{/if}>{$value|truncate:64|escape}</option>
+                            {/foreach}
+                        </select>
+                    </td>
+                </tr>
+            {/if}
+        {foreachelse}
+            <tr>
+                <td class="4">
+                    Для данной категории не заданы параметры фильтрации. 
+                    Задать их можно в <a class="inline" target="_blank" href="?action=products#/products/category_id={$category_id}">настройках категории</a>
+                </td>
+            </tr>
+        {/foreach}
+    </tbody>
+</table>  

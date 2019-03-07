@@ -1,0 +1,93 @@
+<div class="field-group">
+    <div class="field">
+        <div class="name">
+            Статус плагина для поселения
+        </div>
+        <div class="value no-shift s-ibutton-checkbox">
+            <input type="hidden" name="route_settings[status]" value="0">
+            <input type="checkbox" class="ibutton" name="route_settings[status]" value="1"{if $route_settings.status|default:0} checked{/if}>
+            <p class="hint">Чтобы плагин работал для выбранного поселения необходимо задать "ВКЛ"</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="block">
+    <input type="hidden" name="route_settings[view]" value="{$route_settings.view|default:'split'|escape}">
+    <ul class="menu-h float-right" id="s-filter-views" style="visibility: visible;">
+        <li data-view="split"{if $route_settings.view|default:'split' == 'split'} class="selected"{/if}>
+            <a href="#"><i class="icon16 view-splitview"></i></a>
+        </li>
+        <li data-view="table"{if $route_settings.view|default:'split' == 'table'} class="selected"{/if}>
+            <a href="#"><i class="icon16 view-table"></i></a>
+        </li>
+    </ul>
+
+
+    <div class="s-search-form">
+        <input type="text" class="long" id="search" placeholder="Введите фразу для поиска">
+    </div>
+</div>
+
+
+<div class="sidebar left300px s-filter-internal-sidebar"{if $route_settings.view|default:'split' != 'split'} style="display:none;"{/if}>
+    <div class="s-inner-sidebar">
+        <div class="block" id="s-category-list-block">
+            <input type="hidden" name="route_settings[category_id]" value="{$route_settings.category_id|default:0|escape}" />
+            <div class="hierarchical s-collection-list" id="s-category-list">
+                <ul class="menu-v with-icons">
+                    <li class="dr{if $route_settings.category_id|default:0 == 0} selected{/if}" id="category-0" data-type="category">
+                        <a href="#" data-category-id="0" class="s-product-list"><i class="icon16 box"></i><span class="name">Все фильтры</span></a>
+                    </li>
+                </ul>
+                {include './include.categories.html' categories=$categories->getList() inline}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content{if $route_settings.view|default:'split' == 'split'} left300px{/if} s-filter-form blank">
+    <table class="zebra filter-table">
+        <thead>
+            <tr>
+                <th>Категория</th>
+                <th>Название фильтра</th>
+                <th>URL фильтра</th>
+                <th>Параметры фильтрации</th>
+                <th style="width:45px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $filters as $index => $filter}
+                <tr data-filter-id="{$filter.id}" data-category-id="{$filter.category_id}">
+                    <td>
+                        <a target="_blank" href="?action=products#/products/category_id={$filter.category_id}">{$filter.category.name}</a>
+                    </td>
+                    <td>
+                        <strong>{$filter.name}</strong>
+                    </td>
+                    <td class="nowrap">
+                        <a class="inline" href="{$filter.full_url}" target="_blank">{$filter.full_url}</a> 
+                        <i class="icon10 new-window"></i>
+                    </td>
+                    <td>
+                        {$filter.conditions_txt}
+                    </td>
+                    <td>
+                        <a class="edit-filter-btn inline" href="#"><i class="icon16 edit"></i></a>
+                        <a class="delete-filter-btn inline" href="#"><i class="icon16 delete"></i></a>
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px">
+        <a class="add-filter-btn" href="#"><i class="icon16 add"></i>Добавить</a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.categories_tree.init();
+    });
+</script>

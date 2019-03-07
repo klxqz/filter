@@ -1,0 +1,110 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/ace/ace.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte-wa.js"></script>
+{if $lang != 'en'}
+    <script type="text/javascript" src="{$wa_url}wa-content/js/elrte/i18n/elrte.{$lang}.js"></script>
+{/if}
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-wa/wa.elrte.ace.js"></script>
+<link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/redactor.css">
+<script src="{$wa_url}wa-content/js/redactor/redactor.min.js"></script>
+{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/{$lang}.js"></script>{/if}
+<script src="{$wa_url}wa-content/js/jquery-wa/editor.js?v{$wa->version()}"></script>
+
+<style type="text/css">
+    .plugin-menu{
+        float: right;
+        list-style: none;
+    }
+    .plugin-menu li{
+        float: left;
+        margin-left: 10px;
+    }
+    .plugin-menu li a{
+        text-decoration: underline;
+    }
+    .select2-dropdown{
+        z-index: 9999 !important;
+    }
+</style>
+{$settings = $plugin->getSettings()}
+<h1>{$plugin->getName()}</h1>
+
+<ul class="plugin-menu">
+    <li><a href="http://support.wa-plugins.ru/"><i class="icon16 ss pt hammer"></i>Поддержка</a></li>
+</ul>
+
+<div class="fields form">
+    <form action="?module=plugins&id=filter&action=save" method="post" id="plugins-settings-form">
+        {$wa->csrf()}
+
+        <div class="field-group">
+            <div class="field">
+                <div class="name">
+                    Статус плагина
+                </div>
+                <div class="value no-shift s-ibutton-checkbox">
+                    <input type="hidden" name="shop_filter[status]" value="0">
+                    <input type="checkbox" id="ibutton-status" name="shop_filter[status]" value="1"{if $settings.status|default:0} checked{/if}>
+                </div>
+            </div>
+        </div>
+        <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
+            <div class="field">
+                <div class="name">
+                    Выберите поселение
+                </div>
+                <div class="value">
+                    <select name="route_hash" id="route-selector">
+                        <option value="0">Общие настройки для всех поселений</option>
+                        {foreach $route_hashs as $route_url => $route_hash}
+                            <option value="{$route_hash}"{if $route_hash == $settings.route_hash|default:''} selected="selected"{/if}>{$route_url}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
+            <div class="route-container block double-padded">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.tmpl.min.js"></script>
+{literal}
+    <script id="filter-tmpl" type="text/x-jquery-tmpl">
+        <tr data-filter-id="${id}">
+        <td><a target="_blank" href="?action=products#/products/category_id=${category_id}">${category.name}</a></td>
+        <td><strong>${name}</strong></td>
+        <td class="nowrap">
+        <a class="inline" href="${full_url}" target="_blank">${full_url}</a> 
+        <i class="icon10 new-window"></i>
+        </td>
+        <td>
+        ${conditions_txt}
+        </td>
+        <td>
+        <a class="inline edit-filter-btn" href="#"><i class="icon16 edit"></i></a>
+        <a class="inline delete-filter-btn" href="#"><i class="icon16 delete"></i></a>
+        </td>
+        </tr>
+    </script>
+{/literal}
+
+<link rel="stylesheet" href="{$wa_app_static_url}plugins/filter/js/select2/css/select2.min.css?{$plugin->getVersion()}">
+<script src="{$wa_app_static_url}plugins/filter/js/select2/js/select2.min.js?{$plugin->getVersion()}" type="text/javascript"></script>
+<script src="{$wa_app_static_url}plugins/filter/js/select2/js/i18n/ru.js?{$plugin->getVersion()}" type="text/javascript"></script>
+
+<script type="text/javascript" src="{$wa_app_static_url}plugins/filter/js/settings.js?{$plugin->getVersion()}"></script>
+<script type="text/javascript" src="{$wa_app_static_url}plugins/filter/js/categories_tree.js?{$plugin->getVersion()}"></script>
+<script type="text/javascript">
+var wa_app = '{$wa_url}';
+var wa_url = '{$wa_url}';
+var wa_lang = '{$lang}';
+$(function () {
+    $.filter_settings.init();
+});
+</script>

@@ -1,0 +1,219 @@
+<div class="dialog large" id="filter-dialog">
+    <div class="dialog-background"></div>
+    <form id="filter-form" method="post" action="?plugin=filter&module=filter&action=save" enctype="multipart/form-data" >
+        <input type="hidden" name="filter[route_hash]" value="{$filter.route_hash|default:$route_hash|default:''|escape}" />
+        <input type="hidden" name="filter[id]" value="{$filter.id|default:''|escape}" />
+        <input type="hidden" name="filter[group_id]" value="{$filter.group_id|default:$wa->get('group_id')|default:''|escape}" />
+        <div class="dialog-window">
+            <div class="dialog-content">
+                <div class="dialog-content-indent">
+                    <div class="fields form s-dialog-form">
+                        <h1>Настройка фильтра</h1>
+                        <div class="field-group">
+                            <div class="field">
+                                <div class="name">Категория</div>
+                                <div class="value">
+                                    {if $filter.category_id|default:$category_id|default:''}
+                                        <input type="hidden" name="filter[category_id]" value="{$filter.category_id|default:$category_id|default:''}"/>
+                                    {/if}
+                                    <select name="filter[category_id]"{if $filter.category_id|default:''} disabled="disabled"{/if} style="width: 100%">
+                                        {$categories_html}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="filters-features" class="field-group">
+                            <div class="field">
+                                <div class="name">Условия фильтрации</div>
+                                <div class="value">
+                                    <i class="icon16 loading"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <div class="field">
+                                <div class="name">Название</div>
+                                <div class="value">
+                                    <input class="long" name="filter[name]" value="{$filter.name|default:''|escape}"{if isset($filter.name)} data-change="1"{/if}/>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="name">Meta Title</div>
+                                <div class="value">
+                                    <input class="long" name="filter[meta_title]" value="{$filter.meta_title|default:''|escape}"{if isset($filter.meta_title)} data-change="1"{/if}/>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="name">Meta Keywords</div>
+                                <div class="value">
+                                    <textarea name="filter[meta_keywords]">{$filter.meta_keywords|default:''|escape}</textarea>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="name">Meta Description</div>
+                                <div class="value">
+                                    <textarea name="filter[meta_description]">{$filter.meta_description|default:''|escape}</textarea>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="name">URL страницы</div>
+                                <div class="value">
+                                    <input class="long" name="filter[url]" value="{$filter.url|default:''|escape}"/>
+                                    <span class="category-url"></span><span class="filter-url bold"></span>/
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-group" style="min-width: 600px;">
+                            <div class="field description">
+                                <div class="name">
+                                    <label for="description">
+                                        Описание
+                                    </label>
+                                </div>
+                                <div class="value">
+                                    <i class="icon16 loading"></i>
+                                    <div class="s-editor-core-wrapper wa-editor-core-wrapper" style="display:none;">
+                                        <ul class="wa-editor-wysiwyg-html-toggle s-wysiwyg-html-toggle">
+                                            <li class="selected"><a class="wysiwyg" href="#">[s`WYSIWYG`]</a></li>
+                                            <li><a class="html" href="#">HTML</a></li>
+                                        </ul>
+                                        <div>
+                                            <textarea style="display:none" id="filter-description-content" name="filter[description]">{$filter.description|default:''|escape}</textarea>
+                                            <div class="ace">
+                                                <div id="wa-ace-editor-container"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <div class="dialog-buttons-gradient">
+                    <input type="submit" value="Сохранить" class="button green">
+                    или <a class="cancel" href="#">отмена</a>
+                    <span id="dialog-response"></span>
+                </div>
+            </div>
+            {$wa->csrf()}
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        function translit(str) {
+            var space = '-';
+            var link = '';
+            var transl = {
+                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
+                'з': 'z', 'и': 'i', 'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+                'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h',
+                'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sh', 'ъ': space,
+                'ы': 'y', 'ь': space, 'э': 'e', 'ю': 'yu', 'я': 'ya'
+            }
+            if (str != '')
+                str = str.toLowerCase();
+            for (var i = 0; i < str.length; i++) {
+                if (/[а-я]/.test(str.charAt(i))) { // заменяем символы на русском
+                    link += transl[str.charAt(i)];
+                } else if (/[a-z0-9]/.test(str.charAt(i))) { // символы на анг. оставляем как есть
+                    link += str.charAt(i);
+                } else {
+                    if (link.slice(-1) !== space)
+                        link += space; // прочие символы заменяем на space
+                }
+            }
+            return link;
+        }
+
+        function prepareUrl(url) {
+            url = url.replace(/[\/\+\=\\\?\&\#]/g, "");
+            return url;
+        }
+
+        var selected = $('input[name="filter[category_id]"]').val();
+        if ($('select[name="filter[category_id]"] option[value=' + selected + ']').length) {
+            $('select[name="filter[category_id]"] option[value=' + selected + ']').attr('selected', true);
+        }
+
+
+        $('select[name="filter[category_id]"]').change(function () {
+            var name = $(this).find('option:selected').data('name');
+            if (!$('input[name="filter[name]"]').data('change')) {
+                $('input[name="filter[name]"]').val(name);
+            }
+            if (!$('input[name="filter[meta_title]"]').data('change')) {
+                $('input[name="filter[meta_title]"]').val(name);
+            }
+            $('.category-url').text($(this).find('option:selected').data('url'));
+            $('#filters-features .value').html('<i class="icon16 loading"></i>');
+            $.ajax({
+                type: 'POST',
+                url: '?plugin=filter&module=filter&action=getCategoryFilters',
+                dataType: 'html',
+                data: {
+                    id: $(this).val(),
+                    filter_id: $('[name="filter[id]"]').val()
+                },
+                success: function (html, textStatus, jqXHR) {
+                    $('#filters-features .value').html(html);
+                }
+            });
+
+        }).change();
+
+        $('input[name="filter[name]"], input[name="filter[meta_title]"]').change(function () {
+            if ($(this).val()) {
+                $(this).data('change', 'change');
+            } else {
+                $(this).data('change', '');
+            }
+        });
+
+
+
+        $('select[name="filter[category_id]"]').select2({
+            language: "ru"
+        });
+
+
+        $('[name="filter[url]"]').change(function () {
+            $(this).val(prepareUrl($(this).val()));
+            $('.filter-url').text($(this).val());
+        }).change();
+        $('[name="filter[url]"]').keyup(function () {
+            $(this).val(prepareUrl($(this).val()));
+            $('.filter-url').text($(this).val());
+        });
+        $(document).on('change', '[name="condition[feature][]"],.s-feature_value,[name="condition[price]"],[name="price[0]"],[name="price[1]"]', function () {
+            var url = [];
+            $('[name="condition[feature][]"]:checked').each(function () {
+                var feature_id = $(this).val();
+                var $select = $('.s-feature_value[data-feature-id="' + feature_id + '"]');
+                if ($select.data('type') == 'boolean') {
+                    url.push(feature_id + '-' + translit($select.find('option:selected').text()));
+                } else {
+                    url.push(translit($select.find('option:selected').text()));
+                }
+            });
+
+            if ($('[name="condition[price]"]').is(':checked') && ($('[name="price[0]"]').val() || $('[name="price[1]"]').val())) {
+                url.push('price');
+                if ($('[name="price[0]"]').val()) {
+                    url.push('ot-' + $('[name="price[0]"]').val());
+                }
+                if ($('[name="price[1]"]').val()) {
+                    url.push('do-' + $('[name="price[1]"]').val());
+                }
+            }
+
+            $('[name="filter[url]"]').val(url.join('-')).change();
+        });
+    });
+</script>
