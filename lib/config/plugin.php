@@ -8,7 +8,7 @@ return array(
     'name' => 'SEO-фильтр',
     'description' => 'Формирования отдельных страниц для результатов фильтрации',
     'vendor' => 985310,
-    'version' => '1.0.1',
+    'version' => '1.1.0',
     'img' => 'img/filter.png',
     'shop_settings' => true,
     'frontend' => true,

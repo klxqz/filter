@@ -77,6 +77,7 @@
 {literal}
     <script id="filter-tmpl" type="text/x-jquery-tmpl">
         <tr data-filter-id="${id}">
+        <td>{{if enabled == '1'}}<i class="icon16 yes"></i>{{else}}<i class="icon16 no"></i>{{/if}}</td>
         <td><a target="_blank" href="?action=products#/products/category_id=${category_id}">${category.name}</a></td>
         <td><strong>${name}</strong></td>
         <td class="nowrap">

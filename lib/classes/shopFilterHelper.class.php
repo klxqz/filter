@@ -187,6 +187,7 @@ class shopFilterHelper {
         }
 
         $fields = array(
+            'enabled' => 1,
             'route_hash' => $route_hash,
             'category_id' => $category['id'],
             'url' => waRequest::param('filter_url'),

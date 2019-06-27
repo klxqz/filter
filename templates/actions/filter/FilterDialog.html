@@ -11,12 +11,21 @@
                         <h1>Настройка фильтра</h1>
                         <div class="field-group">
                             <div class="field">
+                                <div class="name">Включен</div>
+                                <div class="value">
+                                    <input type="hidden" name="filter[enabled]" value="0"/>
+                                    <input type="checkbox" name="filter[enabled]" value="1"{if !empty($filter.enabled|default:'1')} checked{/if}/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <div class="field">
                                 <div class="name">Категория</div>
                                 <div class="value">
-                                    {if $filter.category_id|default:$category_id|default:''}
+                                    {*if $filter.category_id|default:$category_id|default:''}
                                         <input type="hidden" name="filter[category_id]" value="{$filter.category_id|default:$category_id|default:''}"/>
-                                    {/if}
-                                    <select name="filter[category_id]"{if $filter.category_id|default:''} disabled="disabled"{/if} style="width: 100%">
+                                    {/if*}
+                                    <select name="filter[category_id]"{*if $filter.category_id|default:''} disabled="disabled"{/if*} style="width: 100%">
                                         {$categories_html}
                                     </select>
                                 </div>
@@ -89,6 +98,15 @@
                                     </div>
                                 </div>
                             </div> 
+                        </div>
+
+                        <div class="field-group">
+                            <div class="field">
+                                <div class="name">Дополнительные параметры</div>
+                                <div class="value">
+                                    <textarea name="filter[params]" rows="10" cols="5">{$filter.params|default:''|escape}</textarea>
+                                </div>
+                            </div>
                         </div>
 
                     </div>

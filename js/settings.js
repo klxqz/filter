@@ -22,7 +22,6 @@
             });
 
 
-
             $(document).on('click', '.add-filter-btn', function () {
                 var filter_category_id = $('[name="route_settings[category_id]"]').val();
                 var route_hash = $('[name=route_hash]').val();
@@ -114,6 +113,11 @@
                         labelOff: "Выкл",
                         className: 'mini'
                     }).change(function () {
+                        if ($(this).is(':checked')) {
+                            $(this).closest('.field-group').siblings().show(200);
+                        } else {
+                            $(this).closest('.field-group').siblings().hide(200);
+                        }
                         var f = $("#plugins-settings-form");
                         $.post(f.attr('action'), f.serialize());
                     });

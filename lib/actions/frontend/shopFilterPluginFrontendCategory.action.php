@@ -4,9 +4,11 @@
  * @author wa-plugins.ru <support@wa-plugins.ru>
  * @link http://wa-plugins.ru/
  */
-class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction {
+class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction
+{
 
-    public function prepareCategory($category, $filter) {
+    public function prepareCategory($category, $filter)
+    {
         //$category['id'] = 'filter-plugin-' . $category['id'];
         $category['name'] = $filter['name'];
         $category['meta_title'] = $filter['meta_title'];
@@ -14,19 +16,27 @@ class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction 
         $category['meta_description'] = $filter['meta_description'];
         $category['description'] = $filter['description'];
         $category['parent_id'] = $filter['category_id'];
+
+        if (!empty($filter['params'])) {
+            $rows = explode("\n", $filter['params']);
+            foreach ($rows as $row) {
+                list($key, $value) = array_map('trim', explode('=', $row));
+                $category['params'][$key] = $value;
+            }
+        }
         return $category;
     }
 
-    public function execute() {
-
+    public function execute()
+    {
         $plugin = wa()->getPlugin('filter');
         if (!$plugin->getSettings('status')) {
             throw new waException(_ws("Page not found"), 404);
         }
 
         if (
-                !shopFilterRouteHelper::getRouteSettings(null, 'status') &&
-                !shopFilterRouteHelper::getRouteSettings(0, 'status')
+            !shopFilterRouteHelper::getRouteSettings(null, 'status') &&
+            !shopFilterRouteHelper::getRouteSettings(0, 'status')
         ) {
             throw new waException(_ws("Page not found"), 404);
         }
@@ -43,7 +53,7 @@ class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction 
         $category_model = new shopCategoryModel();
 
         $category = $orig_category = $category_model->getById($filter['category_id']);
-        $category = $this->prepareCategory($category, $filter);
+
 
         $category['subcategories'] = array();
 
@@ -55,6 +65,8 @@ class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction 
             $category['params'][$row['name']] = $row['value'];
         }
 
+        $category = $this->prepareCategory($category, $filter);
+
         // smarty description
         if ($this->getConfig()->getOption('can_use_smarty') && $category['description']) {
             $category['description'] = wa()->getView()->fetch('string:' . $category['description']);
@@ -63,12 +75,12 @@ class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction 
         // Open Graph data
         $category_og_model = new shopCategoryOgModel();
         $category['og'] = $category_og_model->get($orig_category['id']) + array(
-            'type' => 'article',
-            'title' => $category['meta_title'],
-            'description' => $category['meta_description'],
-            'url' => wa()->getConfig()->getHostUrl() . wa()->getConfig()->getRequestUrl(false, true),
-            'image' => '',
-        );
+                'type' => 'article',
+                'title' => $category['meta_title'],
+                'description' => $category['meta_description'],
+                'url' => wa()->getConfig()->getHostUrl() . wa()->getConfig()->getRequestUrl(false, true),
+                'image' => '',
+            );
 
 
         $this->addCanonical();
@@ -196,9 +208,6 @@ class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction 
             $collection->filters($filter_data + waRequest::get());
 
 
-
-
-
             $this->setCollection($collection);
 
             // fix prices
@@ -216,13 +225,13 @@ class shopFilterPluginFrontendCategoryAction extends shopFrontendCategoryAction 
                     if ($fid == 'price') {
                         $min_price = waRequest::get('price_min');
                         if (!empty($min_price)) {
-                            $min_price = (double) $min_price;
+                            $min_price = (double)$min_price;
                         } else {
                             $min_price = null;
                         }
                         $max_price = waRequest::get('price_max');
                         if (!empty($max_price)) {
-                            $max_price = (double) $max_price;
+                            $max_price = (double)$max_price;
                         } else {
                             $max_price = null;
                         }
